@@ -1,0 +1,45 @@
+.ajaxTable
+  table
+    width: 100%
+    border: 1px solid #ddd
+    th
+      padding: 12px 2px !important
+      background: #ddd
+      position: relative
+      cursor: pointer
+      &::after
+        content: ''
+        border: 6px solid transparent
+        border-top-color: #0d7db5
+        transform: translateY(4px)
+        display: inline-block
+        margin: 0 4px
+      &.order-desc::after
+        border-top-color: transparent
+        border-bottom-color: #0d7db5
+        transform: translateY(-2px)
+    td, th
+      border: 1px solid lightgray
+      border-width: 0 1px 0
+      text-align: center
+      padding: 6px 2px
+    tbody tr:nth-child(odd)
+      background: #eee
+  .ajaxTablePagination
+    margin: 10px 0
+    text-align: center
+    > span
+      display: inline-block
+      padding: 2px 4px
+      border: 1px solid #333
+      color: #333
+      background: #eee
+      user-select: none
+      cursor: pointer
+      margin: 0 2px
+      min-width: 40px
+      border-radius: 4px
+      &.active
+        color: white
+        border-color: white
+        background: #333
