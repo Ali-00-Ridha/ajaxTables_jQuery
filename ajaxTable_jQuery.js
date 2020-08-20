@@ -2,7 +2,7 @@ function AjaxTable(options = {}) {
   // make obj variable
   var obj = this;
   //
-  // default settings
+  // defaults
   obj.method = "POST";
   obj.data = {
     limit: 10,
@@ -10,7 +10,6 @@ function AjaxTable(options = {}) {
   };
   obj.limits = [10, 25, 50, 100, 250];
   obj.rowsNoLimit = 0;
-  obj.excludeCols = [];
   //
   for (var key in options) {
     if (options.hasOwnProperty(key)) {
@@ -33,7 +32,6 @@ function AjaxTable(options = {}) {
           var tableHead = "";
           for (var key in resaultJSON.rows[0]) {
             if (resaultJSON.rows[0].hasOwnProperty(key)) {
-              if (obj.excludeCols.includes(key)) {continue;}
               if (obj.data.order_by == key) {
                 if (obj.data.order == "desc") {
                   tableHead += `<th class="order-desc">${key}</th>`;
@@ -54,7 +52,6 @@ function AjaxTable(options = {}) {
             var row = resaultJSON.rows[i];
             for (const key in row) {
               if (row.hasOwnProperty(key)) {
-                if (obj.excludeCols.includes(key)) {continue;}
                 var val = row[key];
                 tableBody += `<td>${val}</td>`;
               }
@@ -86,6 +83,7 @@ function AjaxTable(options = {}) {
             //
             // change data order by
             obj.setData("order_by", $(this).text());
+            obj.setData("offset", 0);
             //
             obj.execute();
           });
@@ -151,12 +149,3 @@ function AjaxTable(options = {}) {
     return `<div class="ajaxTablePagination">${pagination}</div>`;
   }
 }
-
-// $(document).ready( function () {
-//   var ajaxTable = new AjaxTable({
-//     url: "action/series",
-//     target: ".ajaxTable",
-//     excludeCols: ["animeLink", "folderDepthHtml", "subDepthHTML", "updated", "last_update", "custom_url"],
-//   });
-//   ajaxTable.execute();
-// });
