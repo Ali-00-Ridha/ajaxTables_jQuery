@@ -10,6 +10,7 @@ function AjaxTable(options = {}) {
   };
   obj.limits = [10, 25, 50, 100, 250];
   obj.rowsNoLimit = 0;
+  obj.execute = function () {}
   //
   for (var key in options) {
     if (options.hasOwnProperty(key)) {
@@ -21,10 +22,12 @@ function AjaxTable(options = {}) {
     var table = $(this);
     obj.execute = function () {
       obj.data.limit = parseInt(obj.data.limit);
+      table.addClass("ajaxTableLoading");
       $.ajax({
         url: obj.url,
         method: obj.method,
         data: obj.data,
+        async: false,
         success: function (resault) {
           var resaultJSON = JSON.parse(resault);
           obj.rowsNoLimit = resaultJSON.rowsNoLimit;
@@ -82,7 +85,7 @@ function AjaxTable(options = {}) {
             }
             //
             // change data order by
-            obj.setData("order_by", $(this).text());
+            obj.setData("order_by", $(this).html());
             obj.setData("offset", 0);
             //
             obj.execute();
@@ -96,6 +99,7 @@ function AjaxTable(options = {}) {
           });
         }
       });
+      table.removeClass("ajaxTableLoading");
     }
   });
   obj.getForm = function () {
