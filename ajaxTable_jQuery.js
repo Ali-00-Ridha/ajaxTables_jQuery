@@ -27,8 +27,8 @@ function AjaxTable(options = {}) {
         url: obj.url,
         method: obj.method,
         data: obj.data,
-        async: false,
         success: function (resault) {
+          table.removeClass("ajaxTableLoading");
           var resaultJSON = JSON.parse(resault);
           obj.rowsNoLimit = resaultJSON.rowsNoLimit;
           // thead
@@ -99,7 +99,6 @@ function AjaxTable(options = {}) {
           });
         }
       });
-      table.removeClass("ajaxTableLoading");
     }
   });
   obj.getForm = function () {
