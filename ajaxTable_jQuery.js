@@ -90,7 +90,7 @@ function AjaxTable(options = {}) {
             //
             obj.execute();
           });
-          table.find(".ajaxTablePagination span").on("click", function () {
+          table.find(".ajaxTablePagination span:not(.active)").on("click", function () {
             // change data order by
             var offset = parseInt($(this).data("offset"));
             obj.setData("offset", (offset - 1) * obj.data.limit);
@@ -139,7 +139,7 @@ function AjaxTable(options = {}) {
     for (let i = currentPager-1; i > currentPager-3 && i > 0; i--) {
       pagination = `<span data-offset="${i}">${i}</span>`+pagination;
     }
-    pagination += `<span data-offset="${currentPager}" class="active">${currentPager}</span>`;
+    pagination += `<span data-offset="${currentPager}" class="active" style="cursor: not-allowed">${currentPager}</span>`;
     for (let i = currentPager+1; i < currentPager+3 && i<=maxPager; i++) {
       pagination += `<span data-offset="${i}">${i}</span>`;
     }
