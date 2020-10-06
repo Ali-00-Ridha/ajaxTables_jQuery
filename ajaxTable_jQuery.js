@@ -10,6 +10,7 @@ function AjaxTable(options = {}) {
   };
   obj.limits = [10, 25, 50, 100, 250];
   obj.rowsNoLimit = 0;
+  obj.log = false;
   obj.execute = function () {}
   //
   for (var key in options) {
@@ -28,6 +29,9 @@ function AjaxTable(options = {}) {
         method: obj.method,
         data: obj.data,
         success: function (resault) {
+          if (obj.log) {
+            console.log(resault);
+          }
           table.removeClass("ajaxTableLoading");
           var resaultJSON = JSON.parse(resault);
           obj.rowsNoLimit = resaultJSON.rowsNoLimit;
