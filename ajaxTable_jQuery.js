@@ -11,6 +11,8 @@ function AjaxTable(options = {}) {
   obj.limits = [10, 25, 50, 100, 250];
   obj.rowsNoLimit = 0;
   obj.log = false;
+  obj.tableBefore = '';
+  obj.tableAfter  = '';
   obj.execute = function () {}
   //
   for (var key in options) {
@@ -29,9 +31,7 @@ function AjaxTable(options = {}) {
         method: obj.method,
         data: obj.data,
         success: function (resault) {
-          if (obj.log) {
-            console.log(resault);
-          }
+          if (obj.log) console.log(resault);
           table.removeClass("ajaxTableLoading");
           var resaultJSON = JSON.parse(resault);
           obj.rowsNoLimit = resaultJSON.rowsNoLimit;
@@ -67,8 +67,14 @@ function AjaxTable(options = {}) {
           }
           tableBody = `<tbody>${tableBody}</tbody>`;
           //
-          var tableHTML = `<table>${tableHead}${tableBody}</table>`;
-          table.html(obj.getForm() + obj.getPagination() + tableHTML + obj.getPagination());
+          var tableHTML = `${obj.tableBefore}<table>${tableHead}${tableBody}</table>${obj.tableAfter}`;
+          var header = `<div class="ajaxTable-header">
+          ${obj.getForm() + obj.getPagination()}
+          </div>`;
+          var footer = `<div class="ajaxTable-footer">
+          ${obj.getPagination()}
+          </div>`;
+          table.html(header + tableHTML + footer);
           table[0].querySelector("form").onsubmit = function (e) {
             e.preventDefault();
             var formdata = $(this).serializeArray();
@@ -94,7 +100,7 @@ function AjaxTable(options = {}) {
             //
             obj.execute();
           });
-          table.find(".ajaxTablePagination span:not(.active)").on("click", function () {
+          table.find(".ajaxTablePagination span").on("click", function () {
             // change data order by
             var offset = parseInt($(this).data("offset"));
             obj.setData("offset", (offset - 1) * obj.data.limit);
@@ -106,7 +112,7 @@ function AjaxTable(options = {}) {
     }
   });
   obj.getForm = function () {
-    var form = `<form style="margin-bottom: 10px">
+    var form = `<div class="ajaxTable-formContainer"><form>
       <input name="keyword" id="searchSeriesTable" placeholder='Search...'>
     `;
     var formLimit = "";
@@ -123,7 +129,7 @@ function AjaxTable(options = {}) {
       <button type="submit" class="btn btn-sm btn-primary">
         <i class="fa fa-paper-plane"></i> Submit
       </button>
-    </form>
+    </form></div>
     `;
     return form;
   }
@@ -143,7 +149,7 @@ function AjaxTable(options = {}) {
     for (let i = currentPager-1; i > currentPager-3 && i > 0; i--) {
       pagination = `<span data-offset="${i}">${i}</span>`+pagination;
     }
-    pagination += `<span data-offset="${currentPager}" class="active" style="cursor: not-allowed">${currentPager}</span>`;
+    pagination += `<span data-offset="${currentPager}" class="active">${currentPager}</span>`;
     for (let i = currentPager+1; i < currentPager+3 && i<=maxPager; i++) {
       pagination += `<span data-offset="${i}">${i}</span>`;
     }

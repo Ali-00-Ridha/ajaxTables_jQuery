@@ -4,6 +4,20 @@
   to
     transform: translate(-50%, -50%) rotate(359deg)
 .ajaxTable
+  min-height: 60px
+  .ajaxTable-header,
+  .ajaxTable-footer
+    display: flex
+    justify-content: stretch
+    margin: 10px 0
+    .ajaxTable-formContainer
+      flex: 1
+      flex-grow: 1
+    .ajaxTablePagination
+      flex: 1
+      flex-shrink: 1
+      flex-grow: 0
+      display: flex
   table
     width: 100%
     border: 1px solid #ddd
@@ -32,7 +46,6 @@
     tbody tr:nth-child(odd)
       background: #eee
   .ajaxTablePagination
-    margin: 10px 0
     text-align: center
     > span
       display: inline-block
