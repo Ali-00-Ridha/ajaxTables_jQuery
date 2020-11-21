@@ -5,10 +5,10 @@ function AjaxTable(options = {}) {
   // defaults
   obj.method = "POST";
   obj.data = {
-    limit: 10,
     offset: 0,
   };
   obj.limits = [10, 25, 50, 100, 250];
+  obj.orderBy = [];
   obj.rowsNoLimit = 0;
   obj.log = false;
   obj.tableBefore = '';
@@ -20,6 +20,9 @@ function AjaxTable(options = {}) {
       var val = options[key];
       obj[key] = val;
     }
+  }
+  if (obj.data.limit == undefined) {
+    obj.data.limit = obj.limits[0];
   }
   $(obj.target).each(function () {
     var table = $(this);
@@ -39,15 +42,34 @@ function AjaxTable(options = {}) {
           var tableHead = "";
           for (var key in resaultJSON.rows[0]) {
             if (resaultJSON.rows[0].hasOwnProperty(key)) {
-              if (obj.data.order_by == key) {
-                if (obj.data.order == "desc") {
-                  tableHead += `<th class="order-desc">${key}</th>`;
-                }else {
-                  tableHead += `<th>${key}</th>`;
+              var found = false;
+              for (var i = 0; i < obj.orderBy.length; i++) {
+                var el = obj.orderBy[i];
+                if (el.order_by == key) {
+                  found = true;
+                  if (el.order == "desc") {
+                    tableHead += `<th class="order-desc"><span>${key}</span></th>`;
+                  }else if (el.order == "asc") {
+                    tableHead += `<th class="order-asc"><span>${key}</span></th>`;
+                  }else {
+                    tableHead += `<th><span>${key}</span></th>`;
+                  }
                 }
-              }else {
-                tableHead += `<th>${key}</th>`;
               }
+              if (!found) {
+                tableHead += `<th><span>${key}</span></th>`;
+              }
+              // if (obj.data.order_by == key) {
+              //   if (obj.data.order == "desc") {
+              //     tableHead += `<th class="order-desc"><span>${key}</span></th>`;
+              //   }else if (obj.data.order == "asc") {
+              //     tableHead += `<th class="order-asc"><span>${key}</span></th>`;
+              //   }else {
+              //     tableHead += `<th><span>${key}</span></th>`;
+              //   }
+              // }else {
+              //   tableHead += `<th><span>${key}</span></th>`;
+              // }
             }
           }
           tableHead = `<thead><tr>${tableHead}</tr></thead>`;
@@ -72,6 +94,9 @@ function AjaxTable(options = {}) {
           ${obj.getForm() + obj.getPagination()}
           </div>`;
           var footer = `<div class="ajaxTable-footer">
+          <div class="ajaxTable-formContainer">
+            <span class="label label-info well-sm">Total: <span class="badge">${obj.rowsNoLimit}</span></span>
+          </div>
           ${obj.getPagination()}
           </div>`;
           table.html(header + tableHTML + footer);
@@ -84,18 +109,42 @@ function AjaxTable(options = {}) {
             }
             obj.execute();
           };
-          table.find("th").on("click", function () {
+          table.find("th").on("click", function (e) {
             // manibulate orderclass
-            if ($(this).hasClass("order-desc")) {
-              $(this).removeClass("order-desc");
-              obj.setData("order", "asc");
+            if (!e.ctrlKey) {
+              if ($(this).hasClass("order-desc")) {
+                $(this).removeClass("order-desc");
+                $(this).addClass("order-asc");
+                obj.setData("order", "asc");
+                obj.orderBy = [
+                  {"order_by": $(this).text(), "order": "asc"},
+                ];
+              }else {
+                $(this).removeClass("order-asc");
+                $(this).addClass("order-desc");
+                obj.setData("order", "desc");
+                obj.orderBy = [
+                  {"order_by": $(this).text(), "order": "desc"},
+                ];
+              }
             }else {
-              $(this).addClass("order-desc");
-              obj.setData("order", "desc");
+              var found = false;
+              for (let i = 0; i < obj.orderBy.length; i++) {
+                var row = obj.orderBy[i];
+                if (row.order_by == $(this).text()) {
+                  found = true;
+                  row.order =  (row.order == "desc") ? "asc" : "desc";
+                  break;
+                }
+              }
+              if (!found) {
+                obj.orderBy.push({"order_by": $(this).text(), "order": "desc"});
+              }
             }
+            console.log(obj.orderBy);
             //
             // change data order by
-            obj.setData("order_by", $(this).html());
+            obj.setData("order_by", obj.orderBy);
             obj.setData("offset", 0);
             //
             obj.execute();

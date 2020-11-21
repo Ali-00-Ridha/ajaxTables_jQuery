@@ -8,7 +8,7 @@
   .ajaxTable-header,
   .ajaxTable-footer
     display: flex
-    justify-content: stretch
+    align-items: center
     margin: 10px 0
     .ajaxTable-formContainer
       flex: 1
@@ -27,14 +27,19 @@
       position: relative
       cursor: pointer
       user-select: none
-      &::after
+      span
+        display: block
+      &.order-asc::after,
+      &.order-desc::after
         content: ''
         border: 6px solid transparent
-        border-top-color: #0d7db5
-        transform: translateY(4px)
         display: inline-block
         margin: 0 4px
       &.order-desc::after
+        border-bottom-color: transparent
+        border-top-color: #0d7db5
+        transform: translateY(4px)
+      &.order-asc::after
         border-top-color: transparent
         border-bottom-color: #0d7db5
         transform: translateY(-2px)
