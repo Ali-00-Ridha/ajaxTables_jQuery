@@ -13,7 +13,7 @@ function AjaxTable(options = {}) {
   obj.log = false;
   obj.tableBefore = '';
   obj.tableAfter  = '';
-  obj.execute = function () {}
+  obj.execute = function () {};
   //
   for (var key in options) {
     if (options.hasOwnProperty(key)) {
@@ -28,6 +28,7 @@ function AjaxTable(options = {}) {
     var table = $(this);
     obj.execute = function () {
       obj.data.limit = parseInt(obj.data.limit);
+      obj.setData("order_by", obj.orderBy);
       table.addClass("ajaxTableLoading");
       $.ajax({
         url: obj.url,
@@ -59,17 +60,6 @@ function AjaxTable(options = {}) {
               if (!found) {
                 tableHead += `<th><span>${key}</span></th>`;
               }
-              // if (obj.data.order_by == key) {
-              //   if (obj.data.order == "desc") {
-              //     tableHead += `<th class="order-desc"><span>${key}</span></th>`;
-              //   }else if (obj.data.order == "asc") {
-              //     tableHead += `<th class="order-asc"><span>${key}</span></th>`;
-              //   }else {
-              //     tableHead += `<th><span>${key}</span></th>`;
-              //   }
-              // }else {
-              //   tableHead += `<th><span>${key}</span></th>`;
-              // }
             }
           }
           tableHead = `<thead><tr>${tableHead}</tr></thead>`;
