@@ -10,7 +10,8 @@ function AjaxTable(options = {}) {
   obj.limits = [10, 25, 50, 100, 250];
   obj.orderBy = [];
   obj.rowsNoLimit = 0;
-  obj.log = false;
+  obj.selectable_row_target = false;
+  obj.ajaxTable_row_id = 'ajaxTable_row_id';
   obj.tableBefore = '';
   obj.tableAfter  = '';
   obj.execute = function () {};
@@ -24,9 +25,12 @@ function AjaxTable(options = {}) {
   if (obj.data.limit == undefined) {
     obj.data.limit = obj.limits[0];
   }
-  $(obj.target).each(function () {
-    var table = $(this);
-    obj.execute = function () {
+  if (obj.selectable_row_target) {
+    obj.rand_id = Math.round(Math.random() * 100000);
+  }
+  obj.execute = function () {
+    $(obj.target).each(function () {
+      var table = $(this);
       obj.data.limit = parseInt(obj.data.limit);
       obj.setData("order_by", obj.orderBy);
       table.addClass("ajaxTableLoading");
@@ -35,9 +39,15 @@ function AjaxTable(options = {}) {
         method: obj.method,
         data: obj.data,
         success: function (resault) {
-          if (obj.log) console.log(resault);
+          try {
+            var resaultJSON = JSON.parse(resault);
+          } catch (error) {
+            console.log(error);
+            console.log(resault);
+            alert(resault);
+            return false;
+          }
           table.removeClass("ajaxTableLoading");
-          var resaultJSON = JSON.parse(resault);
           obj.rowsNoLimit = resaultJSON.rowsNoLimit;
           // thead
           var tableHead = "";
@@ -62,34 +72,35 @@ function AjaxTable(options = {}) {
               }
             }
           }
+          if (obj.selectable_row_target) {
+            tableHead = `<th class='no_order'><input type='checkbox' name='master' data-target='${obj.rand_id}'></th>` + tableHead;
+          }
           tableHead = `<thead><tr>${tableHead}</tr></thead>`;
           //
           // tbody
           var tableBody = "";
           for (let i = 0; i < resaultJSON.rows.length; i++) {
-            tableBody += `<tr>`;
+            var tableBodyRow = '';
             var row = resaultJSON.rows[i];
             for (const key in row) {
               if (row.hasOwnProperty(key)) {
                 var val = row[key];
-                tableBody += `<td>${val}</td>`;
+                if (obj.selectable_row_target == key) {
+                  tableBodyRow = `<td><input type='checkbox' name='${obj.ajaxTable_row_id}[]' class='ajaxTable-rand-id-${obj.rand_id}' value='${val}'></td>` + tableBodyRow;
+                }
+                tableBodyRow += `<td>${val}</td>`;
               }
             }
-            tableBody += `</tr>`;
+            tableBody += `<tr>${tableBodyRow}</tr>`;
           }
           tableBody = `<tbody>${tableBody}</tbody>`;
           //
-          var tableHTML = `${obj.tableBefore}<table>${tableHead}${tableBody}</table>${obj.tableAfter}`;
+          var tableHTML = `${obj.tableBefore}<div><table>${tableHead}${tableBody}</table></div>${obj.tableAfter}`;
           var header = `<div class="ajaxTable-header">
           ${obj.getForm() + obj.getPagination()}
+            <span class="badge">${obj.rowsNoLimit}</span>
           </div>`;
-          var footer = `<div class="ajaxTable-footer">
-          <div class="ajaxTable-formContainer">
-            <span class="label label-info well-sm">Total: <span class="badge">${obj.rowsNoLimit}</span></span>
-          </div>
-          ${obj.getPagination()}
-          </div>`;
-          table.html(header + tableHTML + footer);
+          table.html(header + tableHTML);
           table[0].querySelector("form").onsubmit = function (e) {
             e.preventDefault();
             var formdata = $(this).serializeArray();
@@ -99,7 +110,7 @@ function AjaxTable(options = {}) {
             }
             obj.execute();
           };
-          table.find("th").on("click", function (e) {
+          table.find("th:not(.no_order)").on("click", function (e) {
             // manibulate orderclass
             if (!e.ctrlKey) {
               if ($(this).hasClass("order-desc")) {
@@ -148,11 +159,15 @@ function AjaxTable(options = {}) {
           });
         }
       });
-    }
-  });
+    });
+  }
   obj.getForm = function () {
+    if (obj.data.keyword == undefined) {
+      obj.data.keyword = "";
+    }
+    obj.data.keyword = obj.data.keyword.trim();
     var form = `<div class="ajaxTable-formContainer"><form>
-      <input name="keyword" id="searchSeriesTable" placeholder='Search...'>
+      <input type="search" name="keyword" id="searchSeriesTable" placeholder='Search Keyword...' value='${obj.data.keyword}'/>
     `;
     var formLimit = "";
     for (let i = 0; i < obj.limits.length; i++) {
@@ -163,8 +178,9 @@ function AjaxTable(options = {}) {
         formLimit += `<option>${limit}</option>`;
       }
     }
-    form += `Limit:
+    form += `<label>Limit:
       <select name="limit">${formLimit}</select>
+      </label>
       <button type="submit" class="btn btn-sm btn-primary">
         <i class="fa fa-paper-plane"></i> Submit
       </button>
@@ -185,7 +201,7 @@ function AjaxTable(options = {}) {
     currentPager = Math.ceil(currentPager);
     var maxPager = (obj.rowsNoLimit / obj.data.limit);
     maxPager = Math.ceil(maxPager);
-    for (let i = currentPager-1; i > currentPager-3 && i > 0; i--) {
+    for (let i = currentPager-1; i > currentPager-3 && i > 1; i--) {
       pagination = `<span data-offset="${i}">${i}</span>`+pagination;
     }
     pagination += `<span data-offset="${currentPager}" class="active">${currentPager}</span>`;
@@ -193,11 +209,12 @@ function AjaxTable(options = {}) {
       pagination += `<span data-offset="${i}">${i}</span>`;
     }
     if (currentPager > 1) {
-      pagination = `<span data-offset="${1}">First</span> ... ` + pagination;
+      pagination = `<span data-offset="1">1</span> ... ` + pagination;
     }
     if (currentPager < maxPager) {
-      pagination = pagination + ` ... <span data-offset="${maxPager}">Last</span>`;
+      pagination = pagination + ` ... <span data-offset="${maxPager}">${maxPager}</span>`;
     }
     return `<div class="ajaxTablePagination">${pagination}</div>`;
   }
+  obj.execute();
 }

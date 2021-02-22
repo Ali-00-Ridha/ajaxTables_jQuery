@@ -4,31 +4,50 @@
   to
     transform: translate(-50%, -50%) rotate(359deg)
 .ajaxTable
+  position: relative
   min-height: 60px
+  margin-top: 20px
+  margin-bottom: 40px
+  border: 1px solid #eee
+  input[type="search"],
+  input[type="search"]::-webkit-search-decoration,
+  input[type="search"]::-webkit-search-cancel-button
+    appearance: auto !important
   .ajaxTable-header,
   .ajaxTable-footer
     display: flex
     align-items: center
-    margin: 10px 0
+    position: sticky
+    background: #fff
+    padding: 5px
     .ajaxTable-formContainer
       flex: 1
-      flex-grow: 1
     .ajaxTablePagination
       flex: 1
-      flex-shrink: 1
-      flex-grow: 0
       display: flex
+  .ajaxTable-header
+    top: 50px
+    z-index: 1
+    input, select
+      border: 2px solid #e5e5e5
+      padding: 4px 8px
+      font-size: 14px
+      line-height: 1.5
+      border-radius: 3px
+  .ajaxTable-footer
+    bottom: 0px
+    padding-bottom: 30px
   table
     width: 100%
-    border: 1px solid #ddd
+    position: relative
     th
-      padding: 12px 2px !important
-      background: #ddd
-      position: relative
+      padding: 4px 2px !important
+      background: #333
+      color: #fff
       cursor: pointer
       user-select: none
-      span
-        display: block
+      position: sticky
+      top: 88px
       &.order-asc::after,
       &.order-desc::after
         content: ''
@@ -47,15 +66,17 @@
       border: 1px solid lightgray
       border-width: 0 1px 0
       text-align: center
-      padding: 6px 2px
+      padding: 4px 2px !important
+    tbody tr
+      background: #fff
     tbody tr:nth-child(odd)
-      background: #eee
+      background: #f3f3f3
   .ajaxTablePagination
     text-align: center
     > span
       display: inline-block
       padding: 2px 4px
-      border: 1px solid #333
+      border: 1px solid #aaa
       color: #333
       background: #eee
       user-select: none
@@ -63,13 +84,15 @@
       margin: 0 2px
       min-width: 40px
       border-radius: 4px
+      background: #fff
       &.active
         color: white
         border-color: white
-        background: #333
+        background: #24b830
+        color: #fff
   &.ajaxTableLoading
     position: relative
-    *
+    tbody *
       filter: blur(10px)
     &::after
       content: ''
