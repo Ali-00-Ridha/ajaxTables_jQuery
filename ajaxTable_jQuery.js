@@ -95,7 +95,9 @@ function AjaxTable(options = {}) {
           }
           tableBody = `<tbody>${tableBody}</tbody>`;
           //
-          var tableHTML = `${obj.tableBefore}<div><table>${tableHead}${tableBody}</table></div>${obj.tableAfter}`;
+          var tableHTML = `${obj.tableBefore}<table>${tableHead}${tableBody}</table>
+          <div class="ajaxTable-footer">${obj.tableAfter}</div>
+          `;
           var header = `<div class="ajaxTable-header">
           ${obj.getForm() + obj.getPagination()}
             <span class="badge">${obj.rowsNoLimit}</span>
@@ -142,7 +144,6 @@ function AjaxTable(options = {}) {
                 obj.orderBy.push({"order_by": $(this).text(), "order": "desc"});
               }
             }
-            console.log(obj.orderBy);
             //
             // change data order by
             obj.setData("order_by", obj.orderBy);
@@ -166,9 +167,7 @@ function AjaxTable(options = {}) {
       obj.data.keyword = "";
     }
     obj.data.keyword = obj.data.keyword.trim();
-    var form = `<div class="ajaxTable-formContainer"><form>
-      <input type="search" name="keyword" id="searchSeriesTable" placeholder='Search Keyword...' value='${obj.data.keyword}'/>
-    `;
+    var form = `<input type="search" name="keyword" id="searchSeriesTable" placeholder='Search Keyword...' value='${obj.data.keyword}'/>`;
     var formLimit = "";
     for (let i = 0; i < obj.limits.length; i++) {
       var limit = obj.limits[i];
@@ -184,9 +183,8 @@ function AjaxTable(options = {}) {
       <button type="submit" class="btn btn-sm btn-primary">
         <i class="fa fa-paper-plane"></i> Submit
       </button>
-    </form></div>
     `;
-    return form;
+    return `<div class="ajaxTable-formContainer"><form>${form}</form></div>`;
   }
   obj.setData = function (key, value) {
     if (obj.data == undefined) {
