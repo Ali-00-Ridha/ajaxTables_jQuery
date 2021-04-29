@@ -7,7 +7,7 @@ function AjaxTable(options = {}) {
   obj.data = {
     offset: 0,
   };
-  obj.limits = [10, 25, 50, 100, 250];
+  obj.limits = [10, 25, 50, 100, 250, 500, 1000];
   obj.orderBy = [];
   obj.rowsNoLimit = 0;
   obj.selectable_row_target = false;
@@ -203,7 +203,7 @@ function AjaxTable(options = {}) {
       pagination = `<span data-offset="${i}">${i}</span>`+pagination;
     }
     pagination += `<span data-offset="${currentPager}" class="active">${currentPager}</span>`;
-    for (let i = currentPager+1; i < currentPager+3 && i<=maxPager; i++) {
+    for (let i = currentPager+1; i < currentPager+3 && i<maxPager; i++) {
       pagination += `<span data-offset="${i}">${i}</span>`;
     }
     if (currentPager > 1) {
